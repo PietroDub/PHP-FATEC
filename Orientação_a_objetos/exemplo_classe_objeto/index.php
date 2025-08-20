@@ -27,4 +27,14 @@
 
     $usuario1->setNome( "Mario Atrás");
     echo "<h1><b>Nome:</b> {$usuario1->getNome()}</h1><br>";
+    
+    //===============================================================
+
+    require_once "Empresa.class.php";
+
+    $empresa1 = new Empresa("Intel", "1223Ow", "Tecnologia");
+
+    var_dump($empresa1);
+
+    echo"<b>Nome da empresa:</b> {$empresa1->getNomeEmpresa()}"
 ?>
