@@ -13,7 +13,7 @@
         <th>Produto</th>
         <th>Preço</th>
         <th>Estoque</th>
-        <th>Ações</th>
+        <th>Ações</th> 
     </tr>   
 <?php
 foreach($resultado as $dados){
