@@ -18,7 +18,7 @@ $mail->Host = 'smtp.gmail.com';
 $mail->SMTPSecure = 'ssl'; // secure transfer enabled REQUIRED for GMail
 $mail->Port = 465; 
 $mail->Username = 'seu_email';
-$mail->Password = 'sua_senha';
+$mail->Password = 'sua_senha'; //gwjc xeox cicp ueko
 
 /*
 HOTMAIL

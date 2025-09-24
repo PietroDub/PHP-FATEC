@@ -9,6 +9,13 @@ require_once "cabecalho.php"
       <div class="col-md-6 text-danger mb-3">
         <?php echo $msg_email; ?>
       </div>
+       
+       <?php
+       //retirar quando for possível o envio do email
+       if($link != ""){
+         echo "<a href='' . $link . '' target='_blank'>Clique aqui</a>'" ;
+       }
+       ?>
       <form class="row g-3" action="#" method="post">
         <div class="col-md-6">
           <label for="email" class="form-label">Email</label>
