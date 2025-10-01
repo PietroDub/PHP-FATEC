@@ -1,6 +1,6 @@
 <?php
 
-require_once "Models/Conexao.php";
+require_once "Models/Conexao_class.php";
 require_once "Models/UsuarioDAO.php";
 require_once "Models/Usuarios.php";
 require_once "config.php";
@@ -117,6 +117,7 @@ class UsuarioController {
     $msg = "";
     $link = "";
     $msg_email = "Será enviado um email para recuperação de senha";
+    
     if ($_POST) {
       if (empty($_POST["email"])) {
         $msg = "Preencha o email!";
@@ -130,20 +131,24 @@ class UsuarioController {
         if (is_array($retorno)) {
           if (count($retorno) > 0) {
             // enviar email
-
             $assunto = "Recuperação de senha - Meu Pet Sumiu.";
-            $link = "http:/localhost/meu_pet_sumiu/index.php?controle=UsuarioController&metodo=trocar_senha&id=" . base64_encode($retorno[0]->id_usuario);
+            $link = "http://localhost/meu-pet-sumiu/index.php?controle=UsuarioController&metodo=trocar_senha&id=" . base64_encode($retorno[0]->id_usuario);
             $nomeDestino = $retorno[0]->nome;
             $destino = $retorno[0]->email;
-            $remetente = "seu_email";
+            $remetente = "pietrosla@gmail.com";
             $nomeRemetente = "Meu Pet Sumiu";
-            
-           $mensagem = "<h2>Senhor(a) " . $nomeDestino . "</h2> <br> <p>Recebemos a solicitação de recuperação de senha.
-            Caso não tenha sido requerida por você, desconsidere essa mensagem.
-            Caso contrário, clique no link abaixo para informar a nova senha</p>
-            <a href='" . $link . "' target='_blank'>Clique aqui</a> <br><br> <p>Atenciosamente<br>" . $nomeRemetente . "</p>";}
-          else {
-            
+
+            $mensagem = "
+            <h2>Senhor(a) " . $nomeDestino . "</h2> <br> 
+            <p>
+              Recebemos a solicitação de recuperação de senha.
+              Caso não tenha sido requerida por você, desconsidere essa mensagem.
+              Caso contrário, clique no link abaixo para informar a nova senha
+            </p>
+            <a href='" . $link . "' target='_blank'>Clique aqui</a> <br><br> 
+            <p>
+              Atenciosamente<br>" . $nomeRemetente . 
+            "</p>";
 
             // $ret = sendMail($assunto, $mensagem, $remetente, $nomeRemetente, $destino, $nomeDestino);
 
@@ -154,6 +159,9 @@ class UsuarioController {
             //   $msg_email = "Erro no envio do email de recuperação. Tente mais tarde!";
             // }
           }
+          else {
+            $msg = "Verifique o email informado!";
+          }
         }
         else {
           $msg = "Verifique o email informado!";
@@ -162,28 +170,41 @@ class UsuarioController {
     }
     require_once "Views/form-email.php";
   } // fim esqueci_senha
-  public function trocar_senha(){
-    $msg =array("","");
-    if(isset($_GET["id"])){
+
+  public function trocar_senha() {
+    $msg = array("", "");
+    $erro = false;
+
+    if (isset($_GET["id"])) {
       $id = base64_decode($_GET["id"]);
-      if($_POST){
-         if(empty($_POST["senha"])){
-           $msg[0] = "Senha Obrigatória";
-           $erro = true;
-         }
-         if(empty($_POST["confirmar_senha"])){
-           $msg[0] = "Confirme a senha";
-           $erro = true;
-         }
-         if(!$erro){
-           if($_POST["senha"] != $_POST["confirmar_senha"]){
-            $msg[0] = "Senhas não são iguais";
-            $erro = true;
-           }
-         }
+
+      if ($_POST) {
+        if (empty($_POST["senha"])){
+          $msg[0] = "Senha obrigatória!";
+          $erro = true;
+        }
+        if (empty($_POST["confirmar-senha"])){
+          $msg[0] = "Confirme a senha!";
+          $erro = true;
+        }
+        if (!$erro && $_POST["senha"] != $_POST["confirmar-senha"]) {
+          $msg[1] = "As senhas não são iguais!";
+          $erro = true;
+        }
+        if (!$erro) {
+          // alterar senha no banco de dados
+          $usuario = new Usuarios(id_usuario: $_POST["id_usuario"], senha: password_hash($_POST["senha"], PASSWORD_DEFAULT));
+          $usuarioDAO = new UsuarioDAO();
+
+          $retorno = $usuarioDAO->alterar_senha($usuario);
+          
+          header("location:index.php?controle=UsuarioController&metodo=login");
+        }
       }
-      require_once "Views/trocar_senha.php";
-  }
+
+      require_once "Views/trocar-senha.php";
+    }
+  } // fim trocar_senha
 }
 // fim da classe
 
